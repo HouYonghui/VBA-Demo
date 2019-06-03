@@ -1,0 +1,31 @@
+Sub AddChartWithLable()
+    Dim rRng As Range, labelRng As Range, i As Integer, j As Integer, chr As Chart
+    Dim xn As Single, yn As Single
+    Set rRng = Application.InputBox("选择要生成散点图的数据区域", Title:="选择区域", Type:=8) '设置要生成气泡散点图的区域
+    Set labelRng = Application.InputBox("选择数据标签区域", Title:="选择区域", Type:=8) '选择数据标签的区域
+    j = rRng.Count / 2
+    xn = Application.WorksheetFunction.Average(rRng.Columns(1))   '计算x轴平均值
+    yn = Application.WorksheetFunction.Average(rRng.Columns(2))   '计算y轴平均值
+    ActiveSheet.Shapes.AddChart2(240, xlXYScatterLines).Select   '生成散点图
+    ActiveChart.SetSourceData Source:=rRng    '散点图数据来自选择的数据区域rRng
+        If labelRng.Count <> ActiveChart.SeriesCollection(1).Points.Count Then  '如果标签数据个数不等于散点图系列点的个数，提示错误
+        MsgBox "标签区域与数据区域不一致。", 64
+    End If
+    With ActiveChart    '选择已经生成的散点图，设置相关属性
+        .SetElement (msoElementDataLabelAbove) '选择已经生成的散点图，增加数据标签位于数据点上方
+        .FullSeriesCollection(1).Select '选择数据系列1
+            Selection.Format.Line.Visible = msoFalse  '去掉散点图的连接线
+        With .SeriesCollection(1) '选择数据系列1
+            .HasDataLabels = True  '显示数据标签
+            For i = 1 To ActiveChart.FullSeriesCollection(1).Points.Count    '设置每一个系列点的数据标签内容=labelRng内的对应单元格的内容
+                ActiveChart.SeriesCollection(1).Points(i).DataLabel.Text = labelRng.Cells(i).Text
+            Next
+        End With
+        .Axes(xlValue).MajorGridlines.Delete  '删除横坐标轴网格线
+        .Axes(xlCategory).MajorGridlines.Delete '删除纵坐标轴网格线
+        .Axes(xlValue).CrossesAt = yn '横坐标轴交叉于纵坐标轴的yn点，yn即y轴数值的平均值
+        .Axes(xlCategory).CrossesAt = xn '纵坐标轴交叉于横坐标轴的xn点，xn即x轴数值的平均值
+        .Axes(xlValue).TickLabelPosition = xlLow '横坐标轴标签位置靠下，不影响阅读
+        .Axes(xlCategory).TickLabelPosition = xlLow '横坐标轴标签位置靠下，不影响阅读
+    End With
+End Sub
