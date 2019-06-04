@@ -1,0 +1,34 @@
+Sub demo1()
+    Dim Sht As Worksheet, HeadRows As Byte, cell As Range
+    Application.ScreenUpdating = False '关闭屏幕刷新
+    Application.Calculation = xlCalculationManual '设置计算模式为手动，提高速度
+    On Error Resume Next
+        Set Sht = Sheets("汇总表") '将“汇总行”赋予对象变量
+        If Err <> 0 Then
+            Sheets.Add after:=Sheets(Sheets.Count)
+            Sheets(Sheets.Count).Name = "汇总表"   '如果有错误，最后位置新建工作表，命名为“汇总表”
+        Else
+            Sheets("汇总表").Cells.Clear
+            Sheets("汇总表").Select '如果没有错误，即已存在“汇总表”，则清空数据，选中
+        End If
+    HeadRows = 2 '设置表头行为2
+    Sheets(1).Rows("1:" & HeadRows).Copy Sheets("汇总表").[a1]   '复制表头行
+    Columns("A:A").Insert     '插入一列
+    Cells(HeadRows, 1) = "表名"   '插入列命名为“表名”
+    For Each Sht In Worksheets   '历遍所有工作表
+        If Sht.Name <> "汇总表" Then   '如果工作表名称非“汇总表”则执行以下
+            If Not IsEmpty(Sht.UsedRange) Then   '若工作表非空，则执行以下
+                With Intersect(Sht.UsedRange.Offset(2, 0), Sht.UsedRange)   '引用数据源工作表中除标题行之外的部分
+                    Set cell = Sheets("汇总表").Cells(Sheets("汇总表").UsedRange.Rows.Count + 1, 2)  '将“汇总表”B列最后一个非空单元格赋值给变量Cell
+                    .Copy cell '复制数据源到Cell 在此处出错，误写成 .copy.cell
+                    cell.Resize(.Rows.Count, .Columns.Count) = .Value  '再次复制，粘贴值
+                    cell.Offset(0, -1).Resize(.Rows.Count, 1).Merge  '合并“表名”列
+                    cell.Offset(0, -1) = Sht.Name '写入表名
+                End With
+            End If
+        End If
+    Next Sht
+    Range(Cells(HeadRows, 1), Cells(Rows.Count, 1).End(xlUp).MergeArea).Borders.LineStyle = xlContinuous   'A列添加边框
+    Application.ScreenUpdating = True    '恢复屏幕更新
+    Application.Calculation = xlCalculationAutomatic   '恢复自动计算
+End Sub
