@@ -1,0 +1,44 @@
+Sub sheetscollect1()
+    Dim sht As Worksheet, shtc As Integer
+    Dim myPath As String, myFile As String, WB As Workbook
+    Application.ScreenUpdating = False
+    Application.Calculation = xlCalculationManual
+    'On Error Resume Next
+        myPath = "E:\Desktop\新建文件夹\"
+        myFile = Dir(myPath & "*.xls")
+        shtc = ThisWorkbook.Sheets.Count
+        Do While myFile <> ""
+            Set WK = Workbooks.Open(myPath & myFile)
+            WK.Sheets("结果表").Copy after:=ThisWorkbook.Sheets(shtc)
+            ThisWorkbook.Sheets("结果表").Name = Mid(ThisWorkbook.Sheets("结果表").Range("A6").Value, 8)
+            Workbooks(myFile).Close False
+            myFile = Dir
+        Loop
+    Application.Calculation = xlCalculationAutomatic
+    Application.ScreenUpdating = True
+End Sub
+
+'数据源中含有自定义名称，则使用以下方法更有效，能够避免名称调用出错
+Sub sheetscollect2()
+    Dim sht As Worksheet, shtc As Integer
+    Dim myPath As String, myFile As String, WB As Workbook
+    Application.ScreenUpdating = False
+    Application.Calculation = xlCalculationManual
+    'On Error Resume Next
+        myPath = "E:\Desktop\新建文件夹\"
+        myFile = Dir(myPath & "*.xls")
+        
+        Do While myFile <> ""
+            shtc = ThisWorkbook.Sheets.Count
+            Set WK = Workbooks.Open(myPath & myFile)
+            WK.Sheets("结果表").Select
+            WK.Sheets("结果表").Cells.Select
+            Selection.Copy ThisWorkbook.Sheets(shtc).Range("a1")
+            ThisWorkbook.Sheets(shtc).Name = Mid(ThisWorkbook.Sheets(shtc).Range("A6").Value, 8)
+            Workbooks(myFile).Close False
+            myFile = Dir
+        Sheets.Add after:=Sheets(Sheets.Count)
+        Loop
+    Application.Calculation = xlCalculationAutomatic
+    Application.ScreenUpdating = True
+End Sub
