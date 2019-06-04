@@ -1,0 +1,22 @@
+Sub HiddenFalse()
+    Dim MyPath, MyFileName As String
+    Dim MyBook As Workbook
+    Dim sht As Worksheet
+    Application.ScreenUpdating = False
+    MyPath = "D:\桌面\2015\"                    '此处填写目标文件夹的路径
+    MyFileName = Dir(MyPath & "*.xlsx")
+    Do Until MyFileName = ""
+        Workbooks.Open MyPath & MyFileName
+        Set MyBook = ActiveWorkbook
+        For Each sht In MyBook.Worksheets
+            Worksheets.Select
+            sht.Activate
+            Cells.Select
+            Selection.EntireRow.Hidden = False
+            Selection.EntireColumn.Hidden = False
+        Next
+        MyBook.Close True                       '关闭工作簿
+        MyFileName = Dir                        '关闭工作簿并保存在目标路径中
+    Loop
+    Application.ScreenUpdating = True
+End Sub
