@@ -1,0 +1,23 @@
+Sub SumSheetsFromDiferentBooks()
+    Dim myPath$, myFile$, AK As Workbook, aRow%, tRow%, i As Integer
+    Dim sht As Worksheet
+    On Error Resume Next
+    Application.ScreenUpdating = False        '冻结屏幕，以防屏幕抖动
+    myPath ="D:\工作-工作底稿\"          '把文件路径定义给变量
+    myFile = Dir(myPath & "*.xlsx")            '依次找寻指定路径中的*.xls文件
+    
+    Do While myFile <> ""                     '当指定路径中有文件时进行循环
+        If myFile <> ThisWorkbook.Name Then
+            Set AK = Workbooks.Open(myPath & myFile)          '打开符合要求的文件
+                For Each sht In Worksheets                    '打开每张工作表
+                    aRow = sht.Range("a65536").End(xlUp).Row                                '选取数据源表格中的最后一行
+                    tRow = ThisWorkbook.Sheets(1).Range("a65536").End(xlUp).Row + 1          '选取目标表格中的最后一行的下一行
+                    sht.Range("a1:t" & aRow).Copy ThisWorkbook.Sheets(1).Range("a" & tRow)   '复制粘贴数据
+                Next
+            Workbooks(myFile).Close False               '关闭源工作簿,并不作修改
+        End If
+        myFile = Dir                                   '找寻下一个*.xls文件
+    Loop
+    Application.ScreenUpdating = True                 '冻结屏幕,此类语句一般成对使用
+    MsgBox "汇总完成，请查看！", 64, "提示"
+End Sub
