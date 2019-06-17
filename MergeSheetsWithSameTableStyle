@@ -1,4 +1,4 @@
-Sub demo1()
+Sub MergeSheetsWithSameTableStyle()
     Dim Sht As Worksheet, HeadRows As Byte, cell As Range
     Application.ScreenUpdating = False '关闭屏幕刷新
     Application.Calculation = xlCalculationManual '设置计算模式为手动，提高速度
