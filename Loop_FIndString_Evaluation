@@ -1,0 +1,26 @@
+
+Sub Loop_FIndString_Evaluation()
+    Dim nRow As Long, mRow As Long, lRow As Long, iRow As Long
+    Dim rng As Range, FromRng As Range
+    nRow = ThisWorkbook.Sheets("员工名册").Range("a1048576").End(xlUp).Row
+    mRow = ThisWorkbook.Sheets("最终数据").Range("f1048576").End(xlUp).Row - 1
+    lRow = ThisWorkbook.Sheets("最终数据").Range("b1048576").End(xlUp).Row + 1
+    iRow = 0
+    Application.ScreenUpdating = False
+    On Error Resume Next
+    For i = 2 To nRow
+        
+        Sheets("员工名册").Range(Sheets("员工名册").Range("a" & i), Sheets("员工名册").Range("d" & i)).Copy
+        With ThisWorkbook.Sheets("最终数据").Range("b" & lRow + iRow)
+            .PasteSpecial xlPasteValues
+        End With
+        Sheets("最终数据").Range(Sheets("最终数据").Range("b" & lRow + iRow + 1), Sheets("最终数据").Range("e" & lRow + iRow + mRow - 1)).FormulaR1C1 = "=R[-1]C"
+        Sheets("最终数据").Range(Sheets("最终数据").Range("f" & lRow + iRow), Sheets("最终数据").Range("f" & lRow + iRow + mRow - 1)).Copy
+        With ThisWorkbook.Sheets("最终数据").Range("f" & lRow + iRow + mRow)
+            .PasteSpecial xlPasteValues
+        End With
+        iRow = iRow + mRow
+        
+    Next i
+    Application.ScreenUpdating = True
+End Sub
