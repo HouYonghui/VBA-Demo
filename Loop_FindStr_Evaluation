@@ -1,0 +1,16 @@
+Sub Loop_FindStr_Evaluation()
+    Dim Vender_S As Range, FindRng As Range, FindStr As String
+    Dim Rng As Range, RngFind As Range, sht As Sheets
+    Dim nRow As Integer, mRow As Integer, jRow As Integer
+    Dim FindAddress As String
+    nRow = ThisWorkbook.Sheets("比对数据").Range("a65536").End(xlUp).Row
+    mRow = ThisWorkbook.Sheets("集采供应商表格").Range("a65536").End(xlUp).Row
+    arr = ThisWorkbook.Sheets("集采供应商表格").Range("A1:A" & nRow).Value
+    For Each Vender_S In ThisWorkbook.Sheets("集采供应商表格").Range("A1:A" & mRow)
+        For Each FindRng In ThisWorkbook.Sheets("比对数据").Range("A1:A" & nRow)
+            If InStr(FindRng, Vender_S) > 0 Then
+                FindRng.Offset(0, 2).Value = Vender_S.Value
+            End If
+        Next
+    Next
+End Sub
