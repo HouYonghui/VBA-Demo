@@ -16,19 +16,22 @@ Sub sensitive_word_filter()
         For Each wRng In ThisWorkbook.Sheets("敏感词列表").Range("A1:A" & nRow)
             With docWord.Content.Find
                 .ClearFormatting
-                .Highlight = False
                 With .Replacement
-                    .ClearFormatting
-                    .Font.ColorIndex = wdRed     '设置替换后的字体为红色
-                    .Font.Size = 20       '设置替换后的字体字号为20号
+                    .Font.ColorIndex = wdRed '设置替换后的字体为红色
+                    .Font.Size = 14 '设置替换后的字体字号为20号
+                    .Font = "微软雅黑"
                 End With
-                .Execute Replace:=wdReplaceAll, Forward:=True, Findtext:=wRng.Value, ReplaceWith:="敏感词" & wRng.Value, Format:=True
-                If .Found = True Then
+                If .Execute(FindText:=wRng.Value, ReplaceWith:=wRng.Value, MatchWholeWord:=True, Replace:=wdReplaceAll) = True Then
                     i = i + 1   '如果找到敏感词，则计数加1
+                Else
+                    i = i
                 End If
             End With
         Next
-        
-    MsgBox "共有" & i & "个敏感词，请检查文案内容"  '提示找到有多少个敏感词
+        If i > 0 Then
+            MsgBox "共有" & i & "个敏感词，请检查文案内容" '提示找到有多少个敏感词,但是实际执行的时候出现错误，需要修改
+        Else
+            MsgBox "无敏感词" '提示找到有多少个敏感词
+        End If
     Application.ScreenUpdating = False
 End Sub
