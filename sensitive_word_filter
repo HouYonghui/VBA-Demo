@@ -1,0 +1,34 @@
+Sub sensitive_word_filter()
+    Dim i As Integer, nRow As Integer
+    Dim cpName As String
+    Dim wRng As Range
+    Dim docApp As Object, docWord As Object, xlsApp As Object
+    On Error Resume Next
+    Application.ScreenUpdating = False
+    nRow = ThisWorkbook.Sheets("敏感词列表").Range("a65536").End(xlUp).Row  '取敏感词列表的最后一行
+    i = 0   '设置敏感词计数初始值为0
+    MsgBox "请选择文案文档", vbDefaultButton1   '弹出框提示选择文案所在的文档，必须是doc、docx格式
+    cpName = Application.GetOpenFilename(filefilter:="Word文档,*.doc; *.docx; *.docm", Title:="请选择要打开的Word文档")  '选择要打开的文件
+    If cpName = "False" Then Exit Sub '未选中则中断执行
+    Set docApp = CreateObject("Word.Application") '创建一个word项目进程
+    docApp.Visible = True '显示打开的文档
+    Set docWord = docApp.Documents.Open(cpName)   '打开word文档
+        For Each wRng In ThisWorkbook.Sheets("敏感词列表").Range("A1:A" & nRow)
+            With docWord.Content.Find
+                .ClearFormatting
+                .Highlight = False
+                With .Replacement
+                    .ClearFormatting
+                    .Font.ColorIndex = wdRed     '设置替换后的字体为红色
+                    .Font.Size = 20       '设置替换后的字体字号为20号
+                End With
+                .Execute Replace:=wdReplaceAll, Forward:=True, Findtext:=wRng.Value, ReplaceWith:="敏感词" & wRng.Value, Format:=True
+                If .Found = True Then
+                    i = i + 1   '如果找到敏感词，则计数加1
+                End If
+            End With
+        Next
+        
+    MsgBox "共有" & i & "个敏感词，请检查文案内容"  '提示找到有多少个敏感词
+    Application.ScreenUpdating = False
+End Sub
